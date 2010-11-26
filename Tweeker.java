@@ -218,27 +218,43 @@ public class Tweeker
         }
     }
     
-    public void keyEvent ( KeyEvent e )
+    public void keyEvent ( KeyEvent kev )
     {
-        switch( e.getID() )
+        switch( kev.getID() )
         {
             case KeyEvent.KEY_RELEASED:
-                if ( (e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) != 0 && e.getKeyCode() == 73 /* i */ )
+                if ( kev.isControlDown() && kev.getKeyCode() == 73 /* i */ )
                 {
                     on = !on;
+                    return;
                 }
                 break;
         }
+        
+        if ( fieldInterfaces[currentFieldIndex] != null )
+            fieldInterfaces[currentFieldIndex].keyEvent( kev );
     }
 }
 
 class InterfaceElementAction
 {
+    public int mouseX, mouseY;
+    public int pmouseX, pmouseY;
+    public boolean mousePressed, keyPressed;
+    public char key;
+    public int keyCode;
+    public KeyEvent keyEvent;
+    public MouseEvent mouseEvent;
+    
     void mouseEnter () {;}
     void mouseExit () {;}
     void mousePressed () {;}
     void mouseReleased () {;}
     void mouseDragged () {;}
+    
+    void keyPressed () {;}
+    void keyTyped () {;}
+    void keyReleased () {;}
 }
 
 class InterfaceElement
@@ -246,10 +262,6 @@ extends InterfaceElementAction
 {
     int x, y, width, height;
     InterfaceElementAction handler;
-    
-    public int mouseX, mouseY;
-    public int pmouseX, pmouseY;
-    private boolean pressed;
     
     InterfaceElement () {}
     
@@ -292,13 +304,13 @@ extends InterfaceElementAction
                 case MouseEvent.MOUSE_PRESSED:
                     pmouseX = mouseX;
                     pmouseY = mouseY;
-                    pressed = true;
+                    mousePressed = true;
                     handler.mousePressed();
                     break;
                 case MouseEvent.MOUSE_RELEASED:
-                    if ( pressed )
+                    if ( mousePressed )
                         handler.mouseReleased();
-                    pressed = false;
+                    mousePressed = false;
                     break;
                 case MouseEvent.MOUSE_DRAGGED:
                     handler.mouseDragged();
@@ -308,12 +320,40 @@ extends InterfaceElementAction
         
         return true;
     }
+    
+    public boolean keyEvent ( KeyEvent kev )
+    {
+        key = kev.getKeyChar();
+        keyCode = kev.getKeyCode();
+        
+        switch ( kev.getID() )
+        {
+            case KeyEvent.KEY_PRESSED:
+                keyPressed = true;
+                handler.keyPressed();
+                break;
+            case KeyEvent.KEY_TYPED:
+                handler.keyTyped();
+                break;
+            case KeyEvent.KEY_RELEASED:
+                if ( keyPressed )
+                    handler.keyReleased();
+                keyPressed = false;
+                break;   
+        }
+        
+        return false;
+    }
 
     void mouseEnter () {;}
     void mouseExit () {;}
     void mousePressed () {;}
     void mouseReleased () {;}
     void mouseDragged () {;}
+    
+    void keyPressed () {;}
+    void keyTyped () {;}
+    void keyReleased () {;}
     
     boolean isInside ( int xx, int yy )
     {
@@ -575,7 +615,7 @@ extends FieldInterface
     }
     
     abstract String getValue ();
-    abstract String setValueFromClipboard ( String s );
+    abstract void setValueFromClipboard ();
 }
 
 class FieldInterfaceString
@@ -597,7 +637,7 @@ extends FieldInterfaceTextual
         return strValue;
     }
     
-    String setValueFromClipboard ( String s )
+    void setValueFromClipboard ( )
     {
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Clipboard clipboard = toolkit.getSystemClipboard();
@@ -613,9 +653,32 @@ extends FieldInterfaceTextual
                 } catch ( Exception e ) {
                     e.printStackTrace();
                 }
-                return st;
+                if ( st != null )
+                {
+                    try {
+                        field.set(papplet, st);
+                    } catch ( Exception e ) {
+                        e.printStackTrace();
+                    }   
+                }
             }
         }
-        return null;
+    }
+    
+    public boolean keyEvent ( KeyEvent kev )
+    {
+        super.keyEvent( kev );
+        
+        switch ( kev.getID() )
+        {
+            case KeyEvent.KEY_RELEASED:
+                if ( kev.isMetaDown() && kev.getKeyCode() == 86 /* i */ )
+                {
+                    setValueFromClipboard();
+                }
+                break;
+        }
+        
+        return false;
     }
 }

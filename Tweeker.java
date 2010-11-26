@@ -27,7 +27,7 @@ public class Tweeker
     final static int TYPE_PRIMITIVE_DOUBLE = 7;
     final static int TYPE_STRING = 8;
     
-    boolean on = true;
+    boolean on = false;
     PApplet papplet;
     
     PFont fnt;
@@ -73,6 +73,16 @@ public class Tweeker
         fnt = papplet.createFont("Verdana", 9);
         
         getFields();
+    }
+    
+    public void show ()
+    {
+        on = true;   
+    }
+    
+    public void hide ()
+    {
+        on = false;   
     }
     
     private void getFields ()

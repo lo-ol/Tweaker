@@ -13,6 +13,7 @@ void setup ()
     background( random( 200 ) );
     
     tweeker = new Tweeker(this);
+    //tweeker.show();
 }
 
 void draw ()

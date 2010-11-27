@@ -1,7 +1,10 @@
+import processing.pdf.*;
 import processing.core.*;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.KeyEvent;
+
+import java.io.File;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.*;
@@ -12,6 +15,9 @@ import java.lang.reflect.Modifier;
 
 /**
  *    Herr Inspektor meet Processing.
+ *
+ *    http://bezier.de/processing/tweeker/
+ *    https://github.com/fjenett/Tweeker
  */
 
 public class Tweeker
@@ -27,8 +33,11 @@ public class Tweeker
     final static int TYPE_PRIMITIVE_DOUBLE = 7;
     final static int TYPE_STRING = 8;
     
-    boolean on = false;
+    boolean showTweeker = false, saveFrame = false, savePDF = false, savePDFBegin = false;
+    boolean preCalled = false; // http://code.google.com/p/processing/issues/detail?id=455
     PApplet papplet;
+    
+    String sessionID;
     
     PFont fnt;
     
@@ -44,6 +53,8 @@ public class Tweeker
     Tweeker ( PApplet _a )
     {
         papplet = _a;
+        
+        sessionID = PApplet.nf(PApplet.hour(),2) + "-" + PApplet.nf(PApplet.minute(),2) + "-" + PApplet.nf(PApplet.second(),2);
         
         upButton = new InterfaceElement( 0, papplet.height-40,
                                          papplet.width / 3, 20 );
@@ -65,7 +76,9 @@ public class Tweeker
                 updateCurrentField();
             }
         });
-                                         
+        
+        papplet.registerPre(this);
+        papplet.registerPost(this);
         papplet.registerDraw(this);
         papplet.registerMouseEvent(this);
         papplet.registerKeyEvent(this);
@@ -73,16 +86,27 @@ public class Tweeker
         fnt = papplet.createFont("Verdana", 9);
         
         getFields();
+        
+        sayHi();
+    }
+    
+    void sayHi ()
+    {
+        System.out.println("TWEEKER says hi! Some shortcuts ..");
+        System.out.println("");
+        System.out.println("Command-T show/hide Tweeker");
+        System.out.println("Command-S save frame");
+        System.out.println("Command-P save PDF");
     }
     
     public void show ()
     {
-        on = true;   
+        showTweeker = true;   
     }
     
     public void hide ()
     {
-        on = false;   
+        showTweeker = false;   
     }
     
     private void getFields ()
@@ -174,10 +198,35 @@ public class Tweeker
             e.printStackTrace();
         }
     }
+    
+    public void pre ()
+    {
+        preCalled = true;
+        
+        if ( savePDFBegin )
+        {
+            papplet.beginRecord( PApplet.PDF, 
+                                 PApplet.year() + "-" + PApplet.nf(PApplet.month(),2) + "-" + PApplet.nf(PApplet.day(),2) + 
+                                 File.separator + sessionID + 
+                                 File.separator + "######.pdf");  
+            savePDFBegin = false;
+            savePDF = true;
+        }
+        
+        papplet.pushMatrix();
+    }
+    
+    public void post ()
+    {
+        if ( !preCalled ) return;
+    }
  
     public void draw ()
     {
-        if ( on )
+        if ( preCalled )
+            papplet.popMatrix();
+                
+        if ( showTweeker && !(saveFrame || savePDF) )
         {
             papplet.pushStyle();
             papplet.fill( 20, 60 );
@@ -188,6 +237,20 @@ public class Tweeker
             renderField();
             
             papplet.popStyle();
+        }
+        else if ( saveFrame )
+        {
+            papplet.saveFrame( PApplet.year() + "-" + PApplet.nf(PApplet.month(),2) + "-" + PApplet.nf(PApplet.day(),2) + 
+                               File.separator + sessionID + 
+                               File.separator + "######.png" );
+            saveFrame = false;
+            System.out.println( "Frame saved." );
+        }
+        else if ( savePDF )
+        {
+            papplet.endRecord();
+            savePDF = false;
+            System.out.println( "PDF saved." );
         }
     }
     
@@ -215,7 +278,7 @@ public class Tweeker
     
     public void mouseEvent ( MouseEvent mev )
     {
-        if ( !on ) return;
+        if ( !showTweeker ) return;
         
         int x = mev.getX(), y = mev.getY();
         
@@ -233,9 +296,24 @@ public class Tweeker
         switch( kev.getID() )
         {
             case KeyEvent.KEY_RELEASED:
-                if ( kev.isMetaDown() && kev.getKeyCode() == 84 /* t */ )
+                if ( kev.isMetaDown() )
                 {
-                    on = !on;
+                    switch ( kev.getKeyCode() )
+                    {
+                        case 84: /* t */
+                            showTweeker = !showTweeker;
+                            break;
+                        case 83: /* s */
+                            saveFrame = true;
+                            break;
+                        case 80: /* p */
+                            savePDFBegin = true;
+                            break;
+                        case 73: /* i */
+                            break;
+                        default:
+                            System.out.println(kev.getKeyCode());
+                    }
                     return;
                 }
                 break;

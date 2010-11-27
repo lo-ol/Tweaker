@@ -1,3 +1,4 @@
+import processing.pdf.*; // http://code.google.com/p/processing/issues/detail?id=459
 
 int numberOfItems = 2, trans = 0;
 int rectW = 10, rectH = 10;

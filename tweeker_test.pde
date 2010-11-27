@@ -1,32 +1,35 @@
-import processing.opengl.*;
 
-boolean drawItems = true, randomColors;
-int ellWidth = 20, ellHeight = 20;
-float testFloat;
-String testString = "test" ;
-
-Tweeker tweeker;
+int numberOfItems = 2, trans = 0;
+int rectW = 10, rectH = 10;
+int tx, ty;
+float rot = 0;
 
 void setup ()
 {
-    size( 500, 200 );
+    size( 500, 500 );
     background( random( 200 ) );
+    tx = width/2;
+    ty = height/2;
     
-    tweeker = new Tweeker(this);
-    //tweeker.show();
+    Tweeker tweeker = new Tweeker(this);
+    tweeker.show();
 }
 
 void draw ()
 {
+    smooth();
     background( 120 );
+    pushMatrix();
     
-    if ( drawItems )
+    translate( tx, ty );
+    rotate( rot );
+    
+    for ( int i = 0; i < numberOfItems; i++ )
     {
-        if ( randomColors )
-            fill( random( 255 ), random( 255 ), random( 255 ) );
-        else
-            fill( 20 );
-            
-        ellipse( random( width ), random( height ), ellWidth, ellHeight );
+        rect( 0,0, rectW,rectH );
+        translate( trans, 0 );
+        rotate( 0.1 );
     }
+    
+    popMatrix();
 }

@@ -1,0 +1,38 @@
+
+    TWEEKER
+    
+    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    
+    This "thing" was spawned by a comment at NODE 2010 in Frankfurt
+    where someone said that the graphical quality of VVVV projects
+    is naturally higher than that of many W-C-R* environments since it
+    allows to fine tune variables on the fly without any additional effort.
+    
+    Although i'm not totally dacor with the conclusion i have to agree
+    that adjusting variables can be painful even with such brilliant
+    initiatives as controlP5** around.
+    
+    Another feature that VVVV has that we'd want for our beloved
+    environment called Processing is that thing named "Herr Inspektor"***
+    which is a get / set and information window for any node in a patch.
+    Sort of a programmers multimeter.
+    
+    So, Tweeker will be a first attempt at creating an "adjust anything"
+    interface and a "peek into what's happening" tool.
+    
+    *) write -> compile -> run
+    **) http://www.sojamo.de/libraries/controlP5/
+    ***) http://vvvv.org/documentation/tutorial-inspektor
+    
+    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    
+    Ideas ..
+    
+    – general information on the running sketch (fps, ...)
+    – filter by type / name
+    – tree like view to go into objects (sketch is root)
+    
+    Problems ..
+    
+    – drawn into main PGraphics: speed, interaction, image ops, saveFrame
+    

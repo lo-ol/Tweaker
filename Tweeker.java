@@ -331,12 +331,12 @@ public class Tweeker
         
         if ( savePDFBegin )
         {
+            savePDFBegin = false;
             papplet.beginRecord( PApplet.PDF, 
                                  "saved" +
                                  File.separator + dateString + 
                                  File.separator + sessionID + 
                                  File.separator + "######.pdf");  
-            savePDFBegin = false;
             savePDF = true;
         }
         

@@ -32,7 +32,15 @@
     – filter by type / name
     – tree like view to go into objects (sketch is root)
     
+    ToDo ..
+    
+    – save, load from file, see problems
+    
     Problems ..
     
-    – drawn into main PGraphics: speed, interaction, image ops, saveFrame
+    – drawn into main PGraphics: thread, speed, interaction,
+      image ops, saveFrame, ..
+    – set vals only remain while running. add save-load will cause
+      projects to have to include tweeker into the distro like
+      a library
     

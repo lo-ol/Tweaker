@@ -1,4 +1,5 @@
 import processing.pdf.*;
+import processing.xml.*;
 import processing.core.*;
 
 import java.awt.event.MouseEvent;
@@ -80,6 +81,7 @@ public class Tweeker
         papplet.registerPre(this);
         papplet.registerPost(this);
         papplet.registerDraw(this);
+
         papplet.registerMouseEvent(this);
         papplet.registerKeyEvent(this);
         
@@ -87,7 +89,36 @@ public class Tweeker
         
         getFields();
         
+        loadSettings();
+        Runtime.getRuntime().addShutdownHook(new Thread(){
+            public void run () {
+                saveSettings();
+            }
+        });
+        
         sayHi();
+    }
+    
+    void loadSettings ()
+    {
+        try {
+            
+            XMLElement sXML = new XMLElement(papplet, "settings.xml");
+            
+        } catch ( Exception e ) {
+            //e.printStackTrace();
+        }
+    }
+    
+    void saveSettings ()
+    {
+        String[] sXML = new String[] {
+            "<?xml ?>",
+            "<tweeker>",
+            "</tweeker>"
+        };
+        
+        papplet.saveStrings( "settings.xml", sXML );
     }
     
     void sayHi ()
@@ -206,7 +237,8 @@ public class Tweeker
         if ( savePDFBegin )
         {
             papplet.beginRecord( PApplet.PDF, 
-                                 PApplet.year() + "-" + PApplet.nf(PApplet.month(),2) + "-" + PApplet.nf(PApplet.day(),2) + 
+                                 "saved" +
+                                 File.separator + PApplet.year() + "-" + PApplet.nf(PApplet.month(),2) + "-" + PApplet.nf(PApplet.day(),2) + 
                                  File.separator + sessionID + 
                                  File.separator + "######.pdf");  
             savePDFBegin = false;
@@ -240,7 +272,8 @@ public class Tweeker
         }
         else if ( saveFrame )
         {
-            papplet.saveFrame( PApplet.year() + "-" + PApplet.nf(PApplet.month(),2) + "-" + PApplet.nf(PApplet.day(),2) + 
+            papplet.saveFrame( "saved" +
+                               File.separator + PApplet.year() + "-" + PApplet.nf(PApplet.month(),2) + "-" + PApplet.nf(PApplet.day(),2) + 
                                File.separator + sessionID + 
                                File.separator + "######.png" );
             saveFrame = false;

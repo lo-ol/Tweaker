@@ -38,7 +38,7 @@ public class Tweeker
     boolean preCalled = false; // http://code.google.com/p/processing/issues/detail?id=455
     PApplet papplet;
     
-    String sessionID;
+    String dateString, sessionID;
     
     PFont fnt;
     
@@ -53,8 +53,11 @@ public class Tweeker
     
     Tweeker ( PApplet _a )
     {
+        sayHi();
+        
         papplet = _a;
         
+        dateString = PApplet.year() + "-" + PApplet.nf(PApplet.month(),2) + "-" + PApplet.nf(PApplet.day(),2);
         sessionID = PApplet.nf(PApplet.hour(),2) + "-" + PApplet.nf(PApplet.minute(),2) + "-" + PApplet.nf(PApplet.second(),2);
         
         upButton = new InterfaceElement( 0, papplet.height-40,
@@ -95,30 +98,120 @@ public class Tweeker
                 saveSettings();
             }
         });
-        
-        sayHi();
     }
     
     void loadSettings ()
     {
+        XMLElement sXML = null;
+        
         try {
-            
-            XMLElement sXML = new XMLElement(papplet, "settings.xml");
-            
+            sXML = new XMLElement(papplet, "settings.xml");
         } catch ( Exception e ) {
             //e.printStackTrace();
+            return;
+        }
+        
+        /* TODO: check same sketch?
+        */
+        
+        XMLElement[] fieldsXML = sXML.getChildren( "fields" );
+        
+        if ( fieldsXML == null || fieldsXML.length <= 0 ) return;
+        
+        fieldsXML = fieldsXML[0].getChildren("field");
+        
+        if ( fieldsXML == null || fieldsXML.length <= 0 ) return;
+        
+        for ( XMLElement fieldXML : fieldsXML )
+        {
+            String name = fieldXML.getStringAttribute("name");
+            String type = fieldXML.getStringAttribute("type");
+            
+            Field realField = null;
+            try {
+                realField = papplet.getClass().getDeclaredField( name );
+            } catch ( Exception e ) {
+                System.err.println( "settings.xml: \"" + name + "\" was not found" );
+                continue;
+            }
+            
+            Class fieldClass = realField.getType();
+            if ( type != null && !fieldClass.getName().equals( type ) )
+            {
+                System.err.println( "settings.xml: \"" + name + "\" is not of type \"" + type + "\"" );
+                continue;
+            }
+            
+            XMLElement[] values = fieldXML.getChildren( "value" );
+            if ( values == null && values.length <= 0 )
+            {
+                System.err.println( "settings.xml: \"" + name + "\" has no value" );
+                continue;
+            }
+            
+            String value = values[0].getContent();
+                
+            try 
+            {
+                if ( fieldClass == int.class )
+                {
+                    realField.setInt( papplet, Integer.parseInt(value) );
+                }
+                else if ( fieldClass == float.class )
+                {
+                    realField.setFloat( papplet, Float.parseFloat(value) );
+                }
+                
+            } catch ( Exception e ) {
+                e.printStackTrace();
+            }
         }
     }
     
     void saveSettings ()
     {
-        String[] sXML = new String[] {
-            "<?xml ?>",
-            "<tweeker>",
-            "</tweeker>"
-        };
+        java.util.Vector<String> sXML = new java.util.Vector();
         
-        papplet.saveStrings( "settings.xml", sXML );
+        sXML.add( "<?xml ?>" );
+        sXML.add( "<tweeker>" );
+        sXML.add( "<sketch name=\""+papplet.getClass().getName()+"\" saved=\""+dateString+"-"+sessionID+"\" />" );
+        
+        sXML.add( "<fields>" );
+        for ( int i = 0; i < fields.length; i++ )
+        {
+            if ( fieldInterfaces[i] == null ) continue;
+            
+            sXML.add( "<field name=\""+fields[i].getName()+"\" "+
+                             "type=\""+fields[i].getType().getName()+"\" "+">" );
+                             
+            if ( fieldInterfaces[i].getClass().getSuperclass() == FieldInterfaceNumberPrimitive.class )
+            {
+                FieldInterfaceNumberPrimitive fi = (FieldInterfaceNumberPrimitive)fieldInterfaces[i];
+                sXML.add( "<minimum>" + fi.getMinimumForXML() + "</minimum>" );
+                sXML.add( "<maximum>" + fi.getMaximumForXML() + "</maximum>" );
+                sXML.add( "<steps>" + fi.getStepsForXML() + "</steps>" );
+                
+                try {
+                    sXML.add( "<value>" + fields[i].get(papplet).toString() + "</value>" );
+                } catch ( Exception e ) {
+                    // ignore
+                }
+            }
+            else
+            {
+                try {
+                    sXML.add( "<value><![CDATA[" + fields[i].get(papplet).toString() + "]]></value>" );
+                } catch ( Exception e ) {
+                    // ignore
+                }
+            }
+            sXML.add( "</field>" );
+        }
+        sXML.add( "</fields>" );
+        
+        sXML.add( "</tweeker>" );
+        
+        papplet.saveStrings( "settings.xml", sXML.toArray(new String[0]) );
     }
     
     void sayHi ()
@@ -128,6 +221,7 @@ public class Tweeker
         System.out.println("Command-T show/hide Tweeker");
         System.out.println("Command-S save frame");
         System.out.println("Command-P save PDF");
+        System.out.println("");
     }
     
     public void show ()
@@ -238,7 +332,7 @@ public class Tweeker
         {
             papplet.beginRecord( PApplet.PDF, 
                                  "saved" +
-                                 File.separator + PApplet.year() + "-" + PApplet.nf(PApplet.month(),2) + "-" + PApplet.nf(PApplet.day(),2) + 
+                                 File.separator + dateString + 
                                  File.separator + sessionID + 
                                  File.separator + "######.pdf");  
             savePDFBegin = false;
@@ -273,7 +367,7 @@ public class Tweeker
         else if ( saveFrame )
         {
             papplet.saveFrame( "saved" +
-                               File.separator + PApplet.year() + "-" + PApplet.nf(PApplet.month(),2) + "-" + PApplet.nf(PApplet.day(),2) + 
+                               File.separator + dateString + 
                                File.separator + sessionID + 
                                File.separator + "######.png" );
             saveFrame = false;
@@ -584,6 +678,9 @@ extends FieldInterface
                       x + value, y + height - 11 );
     }
     
+    abstract String getMinimumForXML();
+    abstract String getMaximumForXML();
+    abstract String getStepsForXML();
     abstract void setMinMaxBasedOnValue();
     abstract int getValueForSlider ();
     abstract String getValueForLabel ();
@@ -621,6 +718,10 @@ extends FieldInterfaceNumberPrimitive
         minimum = intValue - 100;
         maximum = intValue + 100;
     }
+    
+    String getMinimumForXML() { return minimum + ""; }
+    String getMaximumForXML() { return maximum + ""; }
+    String getStepsForXML()  { return "1"; }
     
     int getValueForSlider ()
     {
@@ -673,6 +774,10 @@ extends FieldInterfaceNumberPrimitive
         minimum = floatValue - (width/2)/10;
         maximum = floatValue + (width/2)/10;
     }
+    
+    String getMinimumForXML() { return minimum + ""; }
+    String getMaximumForXML() { return maximum + ""; }
+    String getStepsForXML()  { return "0.1"; }
     
     float getValue ()
     {

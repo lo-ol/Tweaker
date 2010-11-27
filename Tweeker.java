@@ -1,4 +1,5 @@
-import processing.pdf.*;
+//import processing.pdf.*;
+// http://code.google.com/p/processing/issues/detail?id=459
 import processing.xml.*;
 import processing.core.*;
 

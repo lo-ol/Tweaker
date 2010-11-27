@@ -1,9 +1,9 @@
-import processing.pdf.*; // http://code.google.com/p/processing/issues/detail?id=459
 
 int numberOfItems = 2, trans = 0;
 int rectW = 10, rectH = 10;
 int tx, ty;
 float rot = 0;
+color greyValue = 0;
 
 void setup ()
 {
@@ -27,6 +27,7 @@ void draw ()
     
     for ( int i = 0; i < numberOfItems; i++ )
     {
+        fill( greyValue );
         rect( 0,0, rectW,rectH );
         translate( trans, 0 );
         rotate( 0.1 );
@@ -34,3 +35,4 @@ void draw ()
     
     popMatrix();
 }
+

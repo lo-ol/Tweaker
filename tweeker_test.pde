@@ -6,13 +6,13 @@ float rot = 0;
 
 void setup ()
 {
-    size( 500, 500 );
+    size( 400, 400 );
     background( random( 200 ) );
     tx = width/2;
     ty = height/2;
     
     Tweeker tweeker = new Tweeker(this);
-    tweeker.show();
+    //tweeker.show();
 }
 
 void draw ()

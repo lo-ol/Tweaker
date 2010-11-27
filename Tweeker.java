@@ -233,7 +233,7 @@ public class Tweeker
         switch( kev.getID() )
         {
             case KeyEvent.KEY_RELEASED:
-                if ( kev.isControlDown() && kev.getKeyCode() == 73 /* i */ )
+                if ( kev.isMetaDown() && kev.getKeyCode() == 84 /* t */ )
                 {
                     on = !on;
                     return;
@@ -376,12 +376,14 @@ extends InterfaceElement
 {
     Field field;
     PApplet papplet;
+    Object instance;
     
     FieldInterface () {}
     
     FieldInterface ( PApplet _p, Field _f )
     {
         papplet = _p;
+        instance = papplet;
         field = _f;
     }
     
@@ -407,7 +409,7 @@ extends FieldInterface
         
         boolean b = false;
         try {
-            b = field.getBoolean( papplet );
+            b = field.getBoolean( instance );
         } catch ( Exception e ) {
             e.printStackTrace();
         }
@@ -427,8 +429,8 @@ extends FieldInterface
     public void mouseReleased ()
     {
         try {
-            boolean b = field.getBoolean(papplet);
-            field.setBoolean( papplet, !b );
+            boolean b = field.getBoolean(instance);
+            field.setBoolean( instance, !b );
         } catch ( Exception e ) {
             e.printStackTrace();
         }
@@ -501,7 +503,7 @@ extends FieldInterfaceNumberPrimitive
     {
         int intValue = 0;
         try {
-            intValue = field.getInt( papplet );
+            intValue = field.getInt( instance );
         } catch ( Exception e ) {
             e.printStackTrace();
         }
@@ -513,7 +515,7 @@ extends FieldInterfaceNumberPrimitive
     {
         int intValue = 0;
         try {
-            intValue = field.getInt(papplet);
+            intValue = field.getInt(instance);
         } catch ( Exception e ) {
             e.printStackTrace();
         }
@@ -525,7 +527,7 @@ extends FieldInterfaceNumberPrimitive
     {
         int intValue = 0;
         try {
-            intValue = field.getInt(papplet);
+            intValue = field.getInt(instance);
         } catch ( Exception e ) {
             e.printStackTrace();
         }
@@ -537,7 +539,7 @@ extends FieldInterfaceNumberPrimitive
     {
         int v = (int)( PApplet.map( mouseX, x, x + width, minimum, maximum ) );
         try {
-            field.setInt( papplet, v );
+            field.setInt( instance, v );
         } catch ( Exception e ) {
             e.printStackTrace();
         }
@@ -565,7 +567,7 @@ extends FieldInterfaceNumberPrimitive
     {
         float floatValue = 0.0f;
         try {
-            floatValue = field.getFloat( papplet );
+            floatValue = field.getFloat( instance );
         } catch ( Exception e ) {
             e.printStackTrace();
         }
@@ -588,7 +590,7 @@ extends FieldInterfaceNumberPrimitive
         value = (int)(value * 10.0f) / 10.0f;
         
         try {
-            field.setFloat( papplet, value );
+            field.setFloat( instance, value );
         } catch ( Exception e ) {
             e.printStackTrace();
         }
@@ -640,7 +642,7 @@ extends FieldInterfaceTextual
     {
         String strValue = "";
         try {
-            strValue = (String)(field.get( papplet ));
+            strValue = (String)(field.get( instance ));
         } catch ( Exception e ) {
             e.printStackTrace();
         }
@@ -666,7 +668,7 @@ extends FieldInterfaceTextual
                 if ( st != null )
                 {
                     try {
-                        field.set(papplet, st);
+                        field.set(instance, st);
                     } catch ( Exception e ) {
                         e.printStackTrace();
                     }   

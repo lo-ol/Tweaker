@@ -1,9 +1,9 @@
 
-    TWEEKER
+    TWEAKER
     
     - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     
-    https://github.com/fjenett/Tweeker
+    https://github.com/fjenett/Tweaker
     
     - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     
@@ -21,7 +21,7 @@
     which is a get / set and information window for any node in a patch.
     Sort of a programmers multimeter.
     
-    So, Tweeker will be a first attempt at creating an "adjust anything"
+    So, Tweaker will be a first attempt at creating an "adjust anything"
     interface and a "peek into what's happening" tool.
     
     *) write -> compile -> run
@@ -45,6 +45,6 @@
     – drawn into main PGraphics: thread, speed, interaction,
       image ops, saveFrame, ..
     – set vals only remain while running. add save-load will cause
-      projects to have to include tweeker into the distro like
+      projects to have to include tweaker into the distro like
       a library
     

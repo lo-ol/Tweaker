@@ -163,10 +163,38 @@ public class Tweeker
                     realField.setFloat( papplet, Float.parseFloat(value) );
                 }
                 
+                if ( fieldClass == int.class || fieldClass == float.class )
+                {
+                    String mi = null, ma = null;
+                    XMLElement[] miXML = fieldXML.getChildren( "minimum" );
+                    if ( miXML != null && miXML.length > 0 )
+                        mi = miXML[0].getContent();
+                    XMLElement[] maXML = fieldXML.getChildren( "maximum" );
+                    if ( maXML != null && maXML.length > 0 )
+                        ma = maXML[0].getContent();
+                    
+                    FieldInterfaceNumberPrimitive fi = 
+                        (FieldInterfaceNumberPrimitive)(getInterfaceForField( realField ));
+                    if ( fi != null )
+                    {
+                        fi.setMinMaxFromStrings( mi, ma );
+                    }
+                }
+                
             } catch ( Exception e ) {
                 e.printStackTrace();
             }
         }
+    }
+    
+    FieldInterface getInterfaceForField ( Field f )
+    {
+        for ( FieldInterface fi : fieldInterfaces )
+        {
+            if ( fi.field.equals(f) ) return fi;
+        }
+        
+        return null;
     }
     
     void saveSettings ()
@@ -679,6 +707,7 @@ extends FieldInterface
                       x + value, y + height - 11 );
     }
     
+    abstract void setMinMaxFromStrings ( String mi, String ma );
     abstract String getMinimumForXML();
     abstract String getMaximumForXML();
     abstract String getStepsForXML();
@@ -718,6 +747,11 @@ extends FieldInterfaceNumberPrimitive
         }
         minimum = intValue - 100;
         maximum = intValue + 100;
+    }
+    
+    void setMinMaxFromStrings ( String mi, String ma ) {
+        minimum = Integer.parseInt( mi );
+        maximum = Integer.parseInt( ma );
     }
     
     String getMinimumForXML() { return minimum + ""; }
@@ -774,6 +808,11 @@ extends FieldInterfaceNumberPrimitive
         float floatValue = getValue();
         minimum = floatValue - (width/2)/10;
         maximum = floatValue + (width/2)/10;
+    }
+    
+    void setMinMaxFromStrings ( String mi, String ma ) {
+        minimum = Float.parseFloat( mi );
+        maximum = Float.parseFloat( ma );
     }
     
     String getMinimumForXML() { return minimum + ""; }

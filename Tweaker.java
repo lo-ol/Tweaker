@@ -678,7 +678,7 @@ extends FieldInterface
     {
         super( _p, _f );
         setRegion( _x, _y, _w, _h );
-        setMinMaxBasedOnValue();
+        setSliderBasedOnValue();
         setHandler( this );
     }
     
@@ -711,7 +711,7 @@ extends FieldInterface
     abstract String getMinimumForXML();
     abstract String getMaximumForXML();
     abstract String getStepsForXML();
-    abstract void setMinMaxBasedOnValue();
+    abstract void setSliderBasedOnValue();
     abstract int getValueForSlider ();
     abstract String getValueForLabel ();
     abstract void setValueFromSlider ();
@@ -723,21 +723,23 @@ extends FieldInterface
     
     public void mouseReleased ()
     {
-        setMinMaxBasedOnValue();
+        setSliderBasedOnValue();
     }
 }
 
 class FieldInterfaceIntPrimitive
 extends FieldInterfaceNumberPrimitive
 {
-    int minimum = -100, maximum = 100;
+    int sliderMinimum = -100, sliderMaximum = 100;
+    int minimum = Integer.MIN_VALUE;
+    int maximum = Integer.MAX_VALUE;
     
     FieldInterfaceIntPrimitive ( PApplet _p, Field _f, int _x, int _y, int _w, int _h )
     {
         super( _p, _f, _x, _y, _w, _h );
     }
     
-    void setMinMaxBasedOnValue ()
+    void setSliderBasedOnValue ()
     {
         int intValue = 0;
         try {
@@ -745,8 +747,8 @@ extends FieldInterfaceNumberPrimitive
         } catch ( Exception e ) {
             e.printStackTrace();
         }
-        minimum = intValue - 100;
-        maximum = intValue + 100;
+        sliderMinimum = intValue - 100;
+        sliderMaximum = intValue + 100;
     }
     
     void setMinMaxFromStrings ( String mi, String ma ) {
@@ -767,7 +769,7 @@ extends FieldInterfaceNumberPrimitive
             e.printStackTrace();
         }
         
-        return (int)( PApplet.map( intValue, minimum, maximum, 0, width ) );
+        return (int)( PApplet.map( intValue, sliderMinimum, sliderMaximum, 0, width ) );
     }
     
     String getValueForLabel ()
@@ -784,9 +786,16 @@ extends FieldInterfaceNumberPrimitive
     
     void setValueFromSlider ()
     {
-        int v = (int)( PApplet.map( mouseX, x, x + width, minimum, maximum ) );
+        int intValue = (int)( PApplet.map( mouseX, x, x + width, sliderMinimum, sliderMaximum ) );
+                
+        if ( intValue > maximum )
+            intValue = maximum;
+        
+        if ( intValue < minimum )
+            intValue = minimum;
+        
         try {
-            field.setInt( instance, v );
+            field.setInt( instance, intValue );
         } catch ( Exception e ) {
             e.printStackTrace();
         }
@@ -796,18 +805,19 @@ extends FieldInterfaceNumberPrimitive
 class FieldInterfaceFloatPrimitive
 extends FieldInterfaceNumberPrimitive
 {
-    float minimum, maximum;
+    float minimum = Float.MIN_VALUE, maximum = Float.MAX_VALUE;
+    float sliderMinimum, sliderMaximum;
     
     FieldInterfaceFloatPrimitive ( PApplet _p, Field _f, int _x, int _y, int _w, int _h )
     {
         super( _p, _f, _x, _y, _w, _h );
     }
     
-    void setMinMaxBasedOnValue ()
+    void setSliderBasedOnValue ()
     {
         float floatValue = getValue();
-        minimum = floatValue - (width/2)/10;
-        maximum = floatValue + (width/2)/10;
+        sliderMinimum = floatValue - (width/2)/10;
+        sliderMaximum = floatValue + (width/2)/10;
     }
     
     void setMinMaxFromStrings ( String mi, String ma ) {
@@ -827,12 +837,13 @@ extends FieldInterfaceNumberPrimitive
         } catch ( Exception e ) {
             e.printStackTrace();
         }
+        
         return floatValue;
     }
     
     int getValueForSlider ()
     {
-        return (int)( PApplet.map( getValue(), minimum, maximum, 0.0f, width ) );
+        return (int)( PApplet.map( getValue(), sliderMinimum, sliderMaximum, 0.0f, width ) );
     }
     
     String getValueForLabel ()
@@ -842,11 +853,16 @@ extends FieldInterfaceNumberPrimitive
     
     void setValueFromSlider ()
     {
-        float value = PApplet.map( mouseX, x, x + width, minimum, maximum );
-        value = (int)(value * 10.0f) / 10.0f;
+        float floatValue = 
+            PApplet.map( mouseX, x, x + width, 
+                         sliderMinimum, sliderMaximum );
+        floatValue = (int)(floatValue * 10.0f) / 10.0f;
+        
+        if ( floatValue > maximum ) floatValue = maximum;
+        if ( floatValue < minimum ) floatValue = minimum;
         
         try {
-            field.setFloat( instance, value );
+            field.setFloat( instance, floatValue );
         } catch ( Exception e ) {
             e.printStackTrace();
         }
@@ -854,7 +870,7 @@ extends FieldInterfaceNumberPrimitive
     
     public void mouseReleased ()
     {
-        setMinMaxBasedOnValue();
+        setSliderBasedOnValue();
     }
 }
 

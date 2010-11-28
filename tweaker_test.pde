@@ -12,8 +12,8 @@ void setup ()
     tx = width/2;
     ty = height/2;
     
-    Tweeker tweeker = new Tweeker(this);
-    //tweeker.show();
+    Tweaker tweaker = new Tweaker(this);
+    //tweaker.show();
 }
 
 void draw ()

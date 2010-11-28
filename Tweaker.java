@@ -18,11 +18,11 @@ import java.lang.reflect.Modifier;
 /**
  *    Herr Inspektor meet Processing.
  *
- *    http://bezier.de/processing/tweeker/
- *    https://github.com/fjenett/Tweeker
+ *    http://bezier.de/processing/tweaker/
+ *    https://github.com/fjenett/Tweaker
  */
 
-public class Tweeker
+public class Tweaker
 {
     final static int TYPE_GENERIC = -1;
     final static int TYPE_PRIMITIVE_BOOLEAN = 0;
@@ -35,7 +35,7 @@ public class Tweeker
     final static int TYPE_PRIMITIVE_DOUBLE = 7;
     final static int TYPE_STRING = 8;
     
-    boolean showTweeker = false, saveFrame = false, savePDF = false, savePDFBegin = false;
+    boolean showTweaker = false, saveFrame = false, savePDF = false, savePDFBegin = false;
     boolean preCalled = false; // http://code.google.com/p/processing/issues/detail?id=455
     PApplet papplet;
     
@@ -52,7 +52,7 @@ public class Tweeker
     
     InterfaceElement upButton, downButton;
     
-    Tweeker ( PApplet _a )
+    Tweaker ( PApplet _a )
     {
         sayHi();
         
@@ -255,12 +255,12 @@ public class Tweeker
     
     public void show ()
     {
-        showTweeker = true;   
+        showTweaker = true;   
     }
     
     public void hide ()
     {
-        showTweeker = false;   
+        showTweaker = false;   
     }
     
     private void getFields ()
@@ -381,7 +381,7 @@ public class Tweeker
         if ( preCalled )
             papplet.popMatrix();
                 
-        if ( showTweeker && !(saveFrame || savePDF) )
+        if ( showTweaker && !(saveFrame || savePDF) )
         {
             papplet.pushStyle();
             papplet.fill( 20, 60 );
@@ -434,7 +434,7 @@ public class Tweeker
     
     public void mouseEvent ( MouseEvent mev )
     {
-        if ( !showTweeker ) return;
+        if ( !showTweaker ) return;
         
         int x = mev.getX(), y = mev.getY();
         
@@ -457,7 +457,7 @@ public class Tweeker
                     switch ( kev.getKeyCode() )
                     {
                         case 84: /* t */
-                            showTweeker = !showTweeker;
+                            showTweaker = !showTweaker;
                             break;
                         case 83: /* s */
                             saveFrame = true;
